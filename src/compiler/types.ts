@@ -3940,6 +3940,7 @@ namespace ts {
         noEmit?: boolean;
         /*@internal*/noEmitForJsFiles?: boolean;
         noEmitHelpers?: boolean;
+        noEmitOutsideRoot?: boolean;
         noEmitOnError?: boolean;
         noErrorTruncation?: boolean;
         noFallthroughCasesInSwitch?: boolean;

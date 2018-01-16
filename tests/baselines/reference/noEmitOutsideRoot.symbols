@@ -1,0 +1,31 @@
+=== c:/git/bigsolution/ProjectA/src/js/subdir/a.ts ===
+/* this file must be emitted */
+import { x } from "ProjectB/fileFromB";
+>x : Symbol(x, Decl(a.ts, 1, 8))
+
+import { z } from "ProjectB/fileThatNeedsAnother";
+>z : Symbol(z, Decl(a.ts, 2, 8))
+
+export var y = x;
+>y : Symbol(y, Decl(a.ts, 3, 10))
+>x : Symbol(x, Decl(a.ts, 1, 8))
+
+=== c:/git/bigsolution/ProjectB/src/js/fileFromB.ts ===
+/* this file must not be emitted */
+export var x = 1;
+>x : Symbol(x, Decl(fileFromB.ts, 1, 10))
+
+=== c:/git/bigsolution/ProjectB/src/js/fileThatNeedsAnother.ts ===
+/* this file must not be emitted */
+import { w } from "./anotherFromB";
+>w : Symbol(w, Decl(fileThatNeedsAnother.ts, 1, 8))
+
+export var z = w;
+>z : Symbol(z, Decl(fileThatNeedsAnother.ts, 2, 10))
+>w : Symbol(w, Decl(fileThatNeedsAnother.ts, 1, 8))
+
+=== c:/git/bigsolution/ProjectB/src/js/anotherFromB.ts ===
+/* this file must not be emitted */
+export var w = 1;
+>w : Symbol(w, Decl(anotherFromB.ts, 1, 10))
+

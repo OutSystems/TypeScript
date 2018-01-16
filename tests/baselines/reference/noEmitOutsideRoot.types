@@ -1,0 +1,33 @@
+=== c:/git/bigsolution/ProjectA/src/js/subdir/a.ts ===
+/* this file must be emitted */
+import { x } from "ProjectB/fileFromB";
+>x : number
+
+import { z } from "ProjectB/fileThatNeedsAnother";
+>z : number
+
+export var y = x;
+>y : number
+>x : number
+
+=== c:/git/bigsolution/ProjectB/src/js/fileFromB.ts ===
+/* this file must not be emitted */
+export var x = 1;
+>x : number
+>1 : 1
+
+=== c:/git/bigsolution/ProjectB/src/js/fileThatNeedsAnother.ts ===
+/* this file must not be emitted */
+import { w } from "./anotherFromB";
+>w : number
+
+export var z = w;
+>z : number
+>w : number
+
+=== c:/git/bigsolution/ProjectB/src/js/anotherFromB.ts ===
+/* this file must not be emitted */
+export var w = 1;
+>w : number
+>1 : 1
+

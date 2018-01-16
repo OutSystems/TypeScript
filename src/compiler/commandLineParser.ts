@@ -590,6 +590,12 @@ namespace ts {
             description: Diagnostics.Do_not_generate_custom_helper_functions_like_extends_in_compiled_output
         },
         {
+            name: "noEmitOutsideRoot",
+            type: "boolean",
+            category: Diagnostics.Advanced_Options,
+            description: Diagnostics.Do_not_emit_files_outside_the_specified_rootDir
+        },
+        {
             name: "noEmitOnError",
             type: "boolean",
             category: Diagnostics.Advanced_Options,

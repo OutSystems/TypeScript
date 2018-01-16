@@ -522,6 +522,8 @@ namespace ts {
         // Track source files that are source files found by searching under node_modules, as these shouldn't be compiled.
         const sourceFilesFoundSearchingNodeModules = createMap<boolean>();
 
+        const nonLocalFiles = createMap<boolean>();
+
         performance.mark("beforeProgram");
 
         host = host || createCompilerHost(options);
@@ -531,6 +533,7 @@ namespace ts {
         const defaultLibraryPath = host.getDefaultLibLocation ? host.getDefaultLibLocation() : getDirectoryPath(getDefaultLibraryFileName());
         const programDiagnostics = createDiagnosticCollection();
         const currentDirectory = host.getCurrentDirectory();
+        const rootDirAbsolutePath = host.getCanonicalFileName(getNormalizedAbsolutePath(options.rootDir || ".", currentDirectory))
         const supportedExtensions = getSupportedExtensions(options);
 
         // Map storing if there is emit blocking diagnostics for given input
@@ -1135,7 +1138,10 @@ namespace ts {
         }
 
         function isEmitBlocked(emitFileName: string): boolean {
-            return hasEmitBlockingDiagnostics.has(toPath(emitFileName));
+            const emitFilePath = toPath(emitFileName);
+
+            return hasEmitBlockingDiagnostics.has(emitFilePath)
+                || nonLocalFiles.get(emitFilePath);
         }
 
         function emitWorker(program: Program, sourceFile: SourceFile, writeFileCallback: WriteFileCallback, cancellationToken: CancellationToken, emitOnlyDtsFiles?: boolean, customTransformers?: CustomTransformers): EmitResult {
@@ -2145,6 +2151,10 @@ namespace ts {
                 createDiagnosticForOptionName(Diagnostics.Option_0_cannot_be_specified_with_option_1, "noImplicitUseStrict", "alwaysStrict");
             }
 
+            if (options.noEmitOutsideRoot && !options.rootDir) {
+                createDiagnosticForOptionName(Diagnostics.Option_0_cannot_be_specified_without_specifying_option_1, "noEmitOutsideRoot", "rootDir");
+            }
+
             const languageVersion = options.target || ScriptTarget.ES3;
             const outFile = options.outFile || options.out;
 
@@ -2250,6 +2260,13 @@ namespace ts {
                     }
                     else {
                         emitFilesSeen.set(emitFileKey, true);
+                    }
+                    
+                    if (options.noEmitOutsideRoot) {
+                        nonLocalFiles.set(emitFilePath, emitFilePath.indexOf(rootDirAbsolutePath) !== 0);
+                        if (options.diagnostics) {
+                            programDiagnostics.add(createCompilerDiagnostic(Diagnostics.Emitting_of_0_skipped_because_it_s_outside_rootDir_and_noEmitOutsideRoot_was_specified, emitFilePath));
+                        }
                     }
                 }
             }
